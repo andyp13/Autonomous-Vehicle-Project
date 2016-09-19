@@ -4,7 +4,6 @@
 
 void setup() {
   //Will only run once
- int i = 0;
 }
 
 void loop() {
