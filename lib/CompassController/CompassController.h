@@ -1,12 +1,5 @@
-
-
-#include<Arduino.h>
-#include<Wire.h>
-
-#define address 0x1E
-
+#include <config.h>
 //////A Lot of this code is from Sparkfun's tutorial code.
-
 
 class CompassController {
 
@@ -77,11 +70,19 @@ public:
   }
 
   double getAverageHeading() {
-    double sum = 0.0;
-    for (int j =0; j < 4; j++) {
-      sum += average[i];
+      double sum = 0.0;
+
+      if (count < 4) {    //If there has not been four readings, just return the last reading 
+        return degreeHeading;
+      } else {
+
+      for (int j =0; j < 4; j++) {
+        sum += average[i];
+      }
+
+      return sum/4;
+
     }
-    return sum/4;
   }
 
   int getCount() {
