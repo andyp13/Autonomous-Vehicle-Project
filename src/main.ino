@@ -102,7 +102,6 @@ void loop() {
  *TODO: Redo Compasss Class (If needed)
  *TODO: Redo Controller Class to allow for GPS waypoints
  *TODO: Make a class for UltraSonic Sensors
- *TODO: Add the button Class
  *TODO: Add a wireless system (btle, 802.11, etc.)
  *TODO: MultiTasking(Only with Due)
  *TODO: Maybe: Make a class for LiDar Applications
