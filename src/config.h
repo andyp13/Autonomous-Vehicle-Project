@@ -1,7 +1,7 @@
 /*            PINS                   */
-#define BUTTON_PIN 7
-#define STEERING_PIN 5
-#define THROTTLE_PIN 6
+#define kMainButtonPin 7
+#define kSteeringServoPin 5
+#define kThrottlePin 6
 
 /*          DEFAULT VALUES           */
 #define kNuteralThrottle 80

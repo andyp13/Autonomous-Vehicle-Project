@@ -21,7 +21,7 @@ public:
   }
 
 
-  int steeringChange() {
+  int change() {
     /**
     1. check wantedHeading is different that currentHeading
     2. if wantedHeading is different then figure our whether left or right.
