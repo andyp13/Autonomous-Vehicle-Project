@@ -3,7 +3,8 @@
 /*        CLASSES       */
 
 CompassController compass;
-SteeringController steering;
+SteerinmainController steering;
+CommandController mainController;
 Servo steeringServo;
 Servo escServo;
 Button mainButton = Button( kMainButtonPin );
@@ -11,14 +12,20 @@ Button mainButton = Button( kMainButtonPin );
 /*   GLOBAL VARIABLES   */
 //safty
 bool killswitchFlag = true;
-//heading
-/*double currentHeading;
-double newHeading;*/
-//steering
-//int lastSteeringCommand;
 //Time
 int currentTime = 0;
 int lastSerialTime = 0;
+////Commands
+long gCommands[] = {
+// Th  ST    FADE
+  109, 90,    7650, //S
+  90,   155,  2000, //R
+  109,  90,    1350, //S
+  90,   180,  2000, //R
+  109,  90,    2000, //S
+  30,  90,   3000, //STOP
+   80,  90,       0, //Complete
+};
 
 void setup() {
   //Will only run once
@@ -54,30 +61,28 @@ void loop() {
   //Class Loops
   mainButton.loop();
   compass.loop();
-  //gController.loop();    TODO: Replace with correct controller here
+  mainController.loop();    //TODO: Replace with correct controller here
 
   //Check  Button Press
   if ( mainButton.didPress() ) {
     delay(kDelayTime);
-    //gController.start();      TODO: Replace with correct controller here
+    mainController.start();      //TODO: Replace with correct controller here
     killswitchFlag = !killswitchFlag;
     //startHeading = compass.getDegreeHeading();
     //newHeading = startHeading;
   }
 
   //Button If Statements
-  if (!killswitchFlag) {    // As long as the killswitch has not been pressed
-    /* code */
-  } /*else if (!gController.isRunning) {    //If the controller is not running
+if (!mainController.isRunning) {    //If the controller is not running
     killswitchFlag = true;                //make sure nothing is running
-  }           TODO: Replace with correct controller here*/
+  }           //TODO: Replace with correct controller here*/
 
   //Find where to Turn
-  steering.headingChange(/*gController.getSteering()*/1);    //TODO: Replace with correct controller here
+  steering.headingChange(mainController.getSteering());    //TODO: Replace with correct controller here
 
 //As long as the button was not pushed. write to the servo
   if(!killswitchFlag) {
-  escServo.write( /*gController.getThrottle()*/ 1);    //TODO: Replace with the correct  controller here
+  escServo.write( mainController.getThrottle());    //TODO: Replace with the correct  controller here
   steeringServo.write( steering.change());
   } else {
     escServo.write(kNeutralThrottle);

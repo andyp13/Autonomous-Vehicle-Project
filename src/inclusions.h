@@ -6,5 +6,6 @@
 /*          Project Additions       */
 #include "Button.h"
 #include "CompassController.h"
+#include "CommandController.h"
 #include "SteeringController.h"
 #include "config.h"
