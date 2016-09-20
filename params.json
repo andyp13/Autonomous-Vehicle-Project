@@ -1,6 +1,6 @@
 {
   "name": "Autonomous Vehicle Project",
   "tagline": "",
-  "body": "### Welcome to the Autonomous Vehicle Project\r\nThis is a project created by the UCCS Autonomous Vehicle team.\r\n\r\n### Our Current Hardware\r\n* NanoWii atmega32u4\r\n* Compass: HMC5883\r\n* Body: Traxxas Slash\r\n\r\n### Authors and Contributors\r\nThe main contributors are:\r\n* @JonathanVentura\r\n* @andyp13\r\n(Will update with rest of team)\r\n\r\n\r\n### Support or Contact\r\nHaving trouble with our code? Please create an issue and we can get to it as fast as we can.\r\n",
+  "body": "### Welcome to the Autonomous Vehicle Project\r\nThis is a project created by the UCCS Autonomous Vehicle team.\r\n\r\n### Our Current Hardware\r\n* NanoWii atmega32u4\r\n* Compass: HMC5883\r\n* Body: Traxxas Slash\r\n\r\n### Authors and Contributors\r\nThe main contributors are:\r\n* @JonathanVentura\r\n* @andyp13\r\n* @ultrahooligan\r\n(Will update with rest of team)\r\n\r\n\r\n### Support or Contact\r\nHaving trouble with our code? Please create an issue and we can get to it as fast as we can.\r\n",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
