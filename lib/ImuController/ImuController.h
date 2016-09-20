@@ -41,7 +41,7 @@ public:
 
 
 private:
-  MPU60X0 accelGyro;
+  MPU6050 accelGyro;
   int16_t accelX, accelY, accelZ;
   int16_t gyroX, gyroY, gyroZ;
 };

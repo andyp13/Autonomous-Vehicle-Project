@@ -10,5 +10,5 @@
 #include "SteeringController.h"
 #include "config.h"
 #include "I2Cdev.h"
-#include "MPU60X0.h"
+#include "MPU6050.h"
 #include "ImuController.h"
