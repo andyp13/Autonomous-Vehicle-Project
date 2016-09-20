@@ -9,3 +9,6 @@
 #include "CommandController.h"
 #include "SteeringController.h"
 #include "config.h"
+#include "I2Cdev.h"
+#include "MPU60X0.h"
+#include "ImuController.h"

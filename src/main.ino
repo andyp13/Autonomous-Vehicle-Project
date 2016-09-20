@@ -4,6 +4,7 @@
 
 CompassController compass;
 SteeringController steering;
+ImuController accelGyro;
 
 Servo steeringServo;
 Servo escServo;
@@ -47,6 +48,7 @@ void setup() {
   //Class setups
   mainButton.setup();
   compass.setup();
+  accelGyro.setup();
 
   //Time Setup
   currentTime = millis();
@@ -64,6 +66,7 @@ void loop() {
   mainButton.loop();
   compass.loop();
   mainController.loop();    //TODO: Replace with correct controller here
+  accelGyro.loop();
 
   //Check  Button Press
   if ( mainButton.didPress() ) {
@@ -101,6 +104,14 @@ if (!mainController.isRunning()) {    //If the controller is not running
   Serial.print("\t");
   Serial.print(steering.getWantedHeading());
   Serial.print("\n" );
+  Serial.print("Acel:\t");
+  Serial.print("x: ");Serial.print(accelGyro.getAccelX()); Serial.print("/t");
+  Serial.print("y: ");Serial.print(accelGyro.getAccelY()); Serial.print("/t");
+  Serial.print("z: ");Serial.print(accelGyro.getAccelZ()); Serial.print("/n");
+  Serial.print("Gyro: \t");
+  Serial.print("x: ");Serial.print(accelGyro.getGyroX()); Serial.print("/t");
+  Serial.print("y: ");Serial.print(accelGyro.getGyroY()); Serial.print("/t");
+  Serial.print("z: ");Serial.print(accelGyro.getGyroZ()); Serial.print("/t");
   lastSerialTime = currentTime;
 }
 
