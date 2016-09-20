@@ -1,21 +1,21 @@
-#include "inclusions.h"
-
+#include <inclusions.h>
 
 /*        CLASSES       */
-Button mainButton(kMainButtonPin);
+
 CompassController compass;
 SteeringController steering;
 Servo steeringServo;
 Servo escServo;
+Button mainButton = Button( kMainButtonPin );
 
 /*   GLOBAL VARIABLES   */
 //safty
 bool killswitchFlag = true;
 //heading
-double currentHeading;
-double newHeading;
+/*double currentHeading;
+double newHeading;*/
 //steering
-int lastSteeringCommand;
+//int lastSteeringCommand;
 //Time
 int currentTime = 0;
 int lastSerialTime = 0;
@@ -30,9 +30,9 @@ void setup() {
 
   /*      Servo setup       */
   steeringServo.attach(kSteeringServoPin);
-  steeringServo.write(kStraightSteering)
+  steeringServo.write(kStraightSteering);
   escServo.attach(kThrottlePin);
-  escServo.write(kNuteralThrottle);
+  escServo.write(kNeutralThrottle);
 
 
   //Class setups
@@ -61,8 +61,8 @@ void loop() {
     delay(kDelayTime);
     //gController.start();      TODO: Replace with correct controller here
     killswitchFlag = !killswitchFlag;
-    startHeading = compass.getDegreeHeading();
-    newHeading = startHeading;
+    //startHeading = compass.getDegreeHeading();
+    //newHeading = startHeading;
   }
 
   //Button If Statements
@@ -73,15 +73,15 @@ void loop() {
   }           TODO: Replace with correct controller here*/
 
   //Find where to Turn
-  steering.headingChange(/*gController.getSteering()*/);    //TODO: Replace with correct controller here
+  steering.headingChange(/*gController.getSteering()*/1);    //TODO: Replace with correct controller here
 
 //As long as the button was not pushed. write to the servo
   if(!killswitchFlag) {
-  escServo.write( /*gController.getThrottle()*/ );    //TODO: Replace with the correct  controller here
-  gSteering.write( steering.change());
+  escServo.write( /*gController.getThrottle()*/ 1);    //TODO: Replace with the correct  controller here
+  steeringServo.write( steering.change());
   } else {
-    gThrottle.write(THROTTLE_ZERO);
-    gSteering.write(STEERING_ZERO);
+    escServo.write(kNeutralThrottle);
+    steeringServo.write(kStraightSteering);
   }
 
   //Print Serial Info
@@ -92,7 +92,7 @@ void loop() {
   Serial.print("\t");
   Serial.print(compass.getCount());
   Serial.print("\t");
-  Serial.print(newHeading);
+  Serial.print(steering.getWantedHeading());
   Serial.print("\n" );
   lastSerialTime = currentTime;
 }

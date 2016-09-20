@@ -4,14 +4,14 @@
 #define kThrottlePin 6
 
 /*          DEFAULT VALUES           */
-#define kNuteralThrottle 80
+#define kNeutralThrottle 80
 #define kStraightSteering 91
 
 /*          CONVERSIONS              */
 #define kFeetToSecondConv 20
 
 /*          CompassController        */
-#define address 0x1E              //I2C address
+#define kCompassAddress 0x1E              //I2C compass address
 
 /*            TIMINGS                */
 #define kDelayTime 1000

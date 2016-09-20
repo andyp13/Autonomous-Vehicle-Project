@@ -11,7 +11,7 @@ public:
     Wire.begin();
 
     //Put the compass into operating mode
-    Wire.beginTransmission(address);  //open communication
+    Wire.beginTransmission(kCompassAddress);  //open communication
     Wire.write(0x02); //Select Mode register
     Wire.write(0x00); //Continuous measurement mode (Do not shut off)
     Wire.endTransmission();
@@ -28,11 +28,11 @@ public:
       count++;
 
       //Tell where to get Data
-      Wire.beginTransmission(address);
+      Wire.beginTransmission(kCompassAddress);
       Wire.write(0x03);
       Wire.endTransmission();
     //Read Data from each axis, 2 registers per axis
-    Wire.requestFrom(address, 6);
+    Wire.requestFrom(kCompassAddress, 6);
     if (6 <= Wire.available()) {
       x = Wire.read() << 8; //x Most Significant Bit
       x |= Wire.read(); //X Least Significant Bit
@@ -66,13 +66,12 @@ public:
 
   double getDegreeHeading() {
     return degreeHeading;
-    Serial.println(degreeHeading);
   }
 
   double getAverageHeading() {
       double sum = 0.0;
 
-      if (count < 4) {    //If there has not been four readings, just return the last reading 
+      if (count < 4) {    //If there has not been four readings, just return the last reading
         return degreeHeading;
       } else {
 
