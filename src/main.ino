@@ -3,8 +3,8 @@
 /*        CLASSES       */
 
 CompassController compass;
-SteerinmainController steering;
-CommandController mainController;
+SteeringController steering;
+
 Servo steeringServo;
 Servo escServo;
 Button mainButton = Button( kMainButtonPin );
@@ -26,6 +26,8 @@ long gCommands[] = {
   30,  90,   3000, //STOP
    80,  90,       0, //Complete
 };
+
+CommandController mainController(gCommands, kNeutralThrottle,kStraightSteering);
 
 void setup() {
   //Will only run once
@@ -73,7 +75,7 @@ void loop() {
   }
 
   //Button If Statements
-if (!mainController.isRunning) {    //If the controller is not running
+if (!mainController.isRunning()) {    //If the controller is not running
     killswitchFlag = true;                //make sure nothing is running
   }           //TODO: Replace with correct controller here*/
 
