@@ -22,7 +22,7 @@ int lastSerialTime = 0;
 
 void setup() {
   //Will only run once
-  Serial.begin(9600); //Really would like to be faster... depends on board.
+  Serial.begin(9600); //Really would like to be faster... depends on board.Test
 
   // Pin Modes
   pinMode(kSteeringServoPin, OUTPUT);
