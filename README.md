@@ -6,5 +6,6 @@ This code uses the Arduino Framework and should work on all Arduino based micro 
 
 ##What our team uses
 * NanoWii atmega32u4
+* IMU: MPC6050
 * Compass: HMC5883
 * Body: Traxxas Slash
