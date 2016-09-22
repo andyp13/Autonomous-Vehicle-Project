@@ -62,7 +62,7 @@ void loop() {
   //Check Time
   currentTime = millis();
 
-  //Class Loops is it working
+  //Class Loops 
   mainButton.loop();
   compass.loop();
   mainController.loop();    //TODO: Replace with correct controller here
