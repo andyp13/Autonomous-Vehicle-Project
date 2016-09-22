@@ -4,6 +4,8 @@
 
 CompassController compass;
 SteeringController steering;
+ImuController accelGyro;
+
 Servo steeringServo;
 Servo escServo;
 Button mainButton = Button( kMainButtonPin );
@@ -11,18 +13,26 @@ Button mainButton = Button( kMainButtonPin );
 /*   GLOBAL VARIABLES   */
 //safty
 bool killswitchFlag = true;
-//heading
-/*double currentHeading;
-double newHeading;*/
-//steering
-//int lastSteeringCommand;
 //Time
 int currentTime = 0;
 int lastSerialTime = 0;
+////Commands
+long gCommands[] = {
+// Th  ST    FADE
+  109, 90,    7650, //S
+  90,   155,  2000, //R
+  109,  90,    1350, //S
+  90,   180,  2000, //R
+  109,  90,    2000, //S
+  30,  90,   3000, //STOP
+   80,  90,       0, //Complete
+};
+
+CommandController mainController(gCommands, kNeutralThrottle,kStraightSteering);
 
 void setup() {
   //Will only run once
-  Serial.begin(9600); //Really would like to be faster... depends on board.
+  Serial.begin(9600); //Really would like to be faster... depends on board.Test
 
   // Pin Modes
   pinMode(kSteeringServoPin, OUTPUT);
@@ -38,6 +48,7 @@ void setup() {
   //Class setups
   mainButton.setup();
   compass.setup();
+  accelGyro.setup();
 
   //Time Setup
   currentTime = millis();
@@ -54,30 +65,29 @@ void loop() {
   //Class Loops
   mainButton.loop();
   compass.loop();
-  //gController.loop();    TODO: Replace with correct controller here
+  mainController.loop();    //TODO: Replace with correct controller here
+  accelGyro.loop();
 
   //Check  Button Press
   if ( mainButton.didPress() ) {
     delay(kDelayTime);
-    //gController.start();      TODO: Replace with correct controller here
+    mainController.start();      //TODO: Replace with correct controller here
     killswitchFlag = !killswitchFlag;
     //startHeading = compass.getDegreeHeading();
     //newHeading = startHeading;
   }
 
   //Button If Statements
-  if (!killswitchFlag) {    // As long as the killswitch has not been pressed
-    /* code */
-  } /*else if (!gController.isRunning) {    //If the controller is not running
+if (!mainController.isRunning()) {    //If the controller is not running
     killswitchFlag = true;                //make sure nothing is running
-  }           TODO: Replace with correct controller here*/
+  }           //TODO: Replace with correct controller here*/
 
   //Find where to Turn
-  steering.headingChange(/*gController.getSteering()*/1);    //TODO: Replace with correct controller here
+  steering.headingChange(mainController.getSteering());    //TODO: Replace with correct controller here
 
 //As long as the button was not pushed. write to the servo
   if(!killswitchFlag) {
-  escServo.write( /*gController.getThrottle()*/ 1);    //TODO: Replace with the correct  controller here
+  escServo.write( mainController.getThrottle());    //TODO: Replace with the correct  controller here
   steeringServo.write( steering.change());
   } else {
     escServo.write(kNeutralThrottle);
@@ -94,6 +104,14 @@ void loop() {
   Serial.print("\t");
   Serial.print(steering.getWantedHeading());
   Serial.print("\n" );
+  Serial.print("Acel:\t");
+  Serial.print("x: ");Serial.print(accelGyro.getAccelX()); Serial.print("/t");
+  Serial.print("y: ");Serial.print(accelGyro.getAccelY()); Serial.print("/t");
+  Serial.print("z: ");Serial.print(accelGyro.getAccelZ()); Serial.print("/n");
+  Serial.print("Gyro: \t");
+  Serial.print("x: ");Serial.print(accelGyro.getGyroX()); Serial.print("/t");
+  Serial.print("y: ");Serial.print(accelGyro.getGyroY()); Serial.print("/t");
+  Serial.print("z: ");Serial.print(accelGyro.getGyroZ()); Serial.print("/t");
   lastSerialTime = currentTime;
 }
 

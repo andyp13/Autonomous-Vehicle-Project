@@ -6,5 +6,9 @@
 /*          Project Additions       */
 #include "Button.h"
 #include "CompassController.h"
+#include "CommandController.h"
 #include "SteeringController.h"
 #include "config.h"
+#include "I2Cdev.h"
+#include "MPU6050.h"
+#include "ImuController.h"
