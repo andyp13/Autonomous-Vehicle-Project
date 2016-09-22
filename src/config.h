@@ -5,7 +5,7 @@
 
 /*          DEFAULT VALUES           */
 #define kNeutralThrottle 80
-#define kStraightSteering 91
+#define kStraightSteering 90
 
 /*          CONVERSIONS              */
 #define kFeetToSecondConv 20

@@ -32,7 +32,7 @@ CommandController mainController(gCommands, kNeutralThrottle,kStraightSteering);
 
 void setup() {
   //Will only run once
-  Serial.begin(9600); //Really would like to be faster... depends on board.Test
+  Serial.begin(250000); //Really would like to be faster... depends on board.Test
 
   // Pin Modes
   pinMode(kSteeringServoPin, OUTPUT);
@@ -68,13 +68,14 @@ void loop() {
   mainController.loop();    //TODO: Replace with correct controller here
   accelGyro.loop();
 
+  steering.setCurrentHeading(compass.getDegreeHeading());
+
   //Check  Button Press
   if ( mainButton.didPress() ) {
     delay(kDelayTime);
     mainController.start();      //TODO: Replace with correct controller here
     killswitchFlag = !killswitchFlag;
-    //startHeading = compass.getDegreeHeading();
-    //newHeading = startHeading;
+    steering.setNewHeading(compass.getDegreeHeading());
   }
 
   //Button If Statements
@@ -104,14 +105,14 @@ if (!mainController.isRunning()) {    //If the controller is not running
   Serial.print("\t");
   Serial.print(steering.getWantedHeading());
   Serial.print("\n" );
-  Serial.print("Acel:\t");
-  Serial.print("x: ");Serial.print(accelGyro.getAccelX()); Serial.print("/t");
-  Serial.print("y: ");Serial.print(accelGyro.getAccelY()); Serial.print("/t");
-  Serial.print("z: ");Serial.print(accelGyro.getAccelZ()); Serial.print("/n");
-  Serial.print("Gyro: \t");
-  Serial.print("x: ");Serial.print(accelGyro.getGyroX()); Serial.print("/t");
-  Serial.print("y: ");Serial.print(accelGyro.getGyroY()); Serial.print("/t");
-  Serial.print("z: ");Serial.print(accelGyro.getGyroZ()); Serial.print("/t");
+  /*Serial.print("Acel:");Serial.print("\n");
+  Serial.print("x: ");Serial.print(accelGyro.getAccelX()); Serial.print("\t");
+  Serial.print("y: ");Serial.print(accelGyro.getAccelY()); Serial.print("\t");
+  Serial.print("z: ");Serial.print(accelGyro.getAccelZ()); Serial.print("\n");
+  Serial.print("Gyro:"); Serial.print("\n");
+  Serial.print("x: ");Serial.print(accelGyro.getGyroX()); Serial.print("\t");
+  Serial.print("y: ");Serial.print(accelGyro.getGyroY()); Serial.print("\t");
+  Serial.print("z: ");Serial.print(accelGyro.getGyroZ()); Serial.print("\n");*/
   lastSerialTime = currentTime;
 }
 

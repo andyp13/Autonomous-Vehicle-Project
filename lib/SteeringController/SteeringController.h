@@ -5,6 +5,13 @@ class SteeringController {
 public:
   SteeringController(){}
 
+  void setNewHeading(double startHeading) {
+    wantedHeading = startHeading;
+  }
+  void setCurrentHeading(double newCurrentHeading) {
+    currentHeading = newCurrentHeading;
+  }
+
   void headingChange(long steeringCommand) {
 
     if (lastSteeringCommand != steeringCommand) {   //If the last command is not the current
