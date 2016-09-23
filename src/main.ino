@@ -22,7 +22,7 @@ long gCommands[] = {
   109, 90,    7650, //S
   90,   155,  2000, //R
   109,  90,    1350, //S
-  90,   180,  2000, //R
+  90,   155,  2000, //R
   109,  90,    2000, //S
   30,  90,   3000, //STOP
    80,  90,       0, //Complete
@@ -62,7 +62,7 @@ void loop() {
   //Check Time
   currentTime = millis();
 
-  //Class Loops 
+  //Class Loops
   mainButton.loop();
   compass.loop();
   mainController.loop();    //TODO: Replace with correct controller here
