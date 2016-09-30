@@ -37,8 +37,6 @@
      - pip install -U platformio
 
  script:
-     - pio lib -g install WiFi101
-     - pio lib -g install Scheduler
      - platformio run
 
 
