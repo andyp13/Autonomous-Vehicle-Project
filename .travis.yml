@@ -37,6 +37,7 @@
      - pip install -U platformio
 
  script:
+     - pio lib -g install WiFi101
      - platformio run
 
 
