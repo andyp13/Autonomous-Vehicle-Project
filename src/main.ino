@@ -5,6 +5,9 @@
 CompassController compass;
 SteeringController steering;
 ImuController accelGyro;
+WifiAccessPoint myAccessPoint;
+CommunicationKey updateKey;
+I2CSend RcController;
 
 Servo steeringServo;
 Servo escServo;
@@ -32,29 +35,82 @@ CommandController mainController(gCommands, kNeutralThrottle,kStraightSteering);
 
 void setup() {
   //Will only run once
-  Serial.begin(250000); //Really would like to be faster... depends on board.Test
+  Serial.begin(9600); //Really would like to be faster... depends on board.Test
+  while(!Serial);
+  Serial.println("Booting Up");
 
   // Pin Modes
-  pinMode(kSteeringServoPin, OUTPUT);
-  pinMode(kThrottlePin, OUTPUT);
+/*  pinMode(kSteeringServoPin, OUTPUT);
+  pinMode(kThrottlePin, OUTPUT);*/
 
   /*      Servo setup       */
-  steeringServo.attach(kSteeringServoPin);
+  /*steeringServo.attach(kSteeringServoPin);
   steeringServo.write(kStraightSteering);
   escServo.attach(kThrottlePin);
-  escServo.write(kNeutralThrottle);
+  escServo.write(kNeutralThrottle);*/
+  pinMode(LED_BUILTIN, OUTPUT);
 
 
   //Class setups
   mainButton.setup();
-  compass.setup();
+  //compass.setup();
   accelGyro.setup();
+  Serial.println("Main Classes Setup, Setting up Wifi");
 
+  myAccessPoint.setup();
+  Serial.println("Wifi Setup");
+  Serial.println("Steeting up RC controller");
+  RcController.setup();
+  Serial.println("All classes setup");
+
+Serial.println("Getting Time");
   //Time Setup
   currentTime = millis();
 
+  Serial.println("Getting compass info");
+  steering.setNewHeading(compass.getDegreeHeading());
+
   //Let the compass/gps wake up
+  Serial.println("Warming compass and wifi up.");
   delay(750);
+  Serial.println("All done.");
+  Serial.println("Starting Loops");
+
+  Serial.println("Starting Main Button Loop");
+  Scheduler.startLoop(buttonLoop);
+
+  Serial.println("Starting Main Controller Loop");
+  Scheduler.startLoop(mainControllerLoop);
+
+  Serial.println("Starting Access Point Loop");
+  Scheduler.startLoop(updateWebpage);
+
+  //Serial.println("Starting RC Controller Loop");
+  //Scheduler.startLoop(rcControllerLoop);
+}
+
+void rcControllerLoop() {
+RcController.returnNumbers();
+delay(10);       //UPdate at 100 hertz
+}
+
+void buttonLoop() {
+  mainButton.loop();
+  yield();
+}
+
+void mainControllerLoop() {
+  mainController.loop();
+  yield();
+}
+
+void updateWebpage() {
+  if (!killswitchFlag) {
+    myAccessPoint.updateInformation(mainController.getThrottle(), steering.change(), compass.getDegreeHeading(), steering.getWantedHeading(), !killswitchFlag);
+  } else {
+    myAccessPoint.updateInformation(kNeutralThrottle, kStraightSteering, compass.getDegreeHeading(), steering.getWantedHeading(), !killswitchFlag);
+  }
+  delay(500);
 }
 
 void loop() {
@@ -63,10 +119,11 @@ void loop() {
   currentTime = millis();
 
   //Class Loops
-  mainButton.loop();
-  compass.loop();
-  mainController.loop();    //TODO: Replace with correct controller here
-  accelGyro.loop();
+  //mainButton.loop();
+  //compass.loop();
+  //mainController.loop();    //TODO: Replace with correct controller here
+  //accelGyro.loop();
+  myAccessPoint.loop();
 
   steering.setCurrentHeading(compass.getDegreeHeading());
 
@@ -88,11 +145,9 @@ if (!mainController.isRunning()) {    //If the controller is not running
 
 //As long as the button was not pushed. write to the servo
   if(!killswitchFlag) {
-  escServo.write( mainController.getThrottle());    //TODO: Replace with the correct  controller here
-  steeringServo.write( steering.change());
+  RcController.changeVariables(mainController.getThrottle(), steering.getWantedHeading());
   } else {
-    escServo.write(kNeutralThrottle);
-    steeringServo.write(kStraightSteering);
+    RcController.changeVariables(kNeutralThrottle, kStraightSteering);
   }
 
   //Print Serial Info
@@ -116,13 +171,16 @@ if (!mainController.isRunning()) {    //If the controller is not running
   lastSerialTime = currentTime;
 }
 
+
+
+//Update webpage Info
+
+yield();
+
 }
 /** Things to do... no perticular order. Not all need to be done... When you finish it. delete and push.
- *TODO: Redo Compasss Class (If needed)
  *TODO: Redo Controller Class to allow for GPS waypoints
  *TODO: Make a class for UltraSonic Sensors
- *TODO: Add a wireless system (btle, 802.11, etc.)
- *TODO: MultiTasking(Only with Due)
  *TODO: Maybe: Make a class for LiDar Applications
  *TODO: Add a GPS controller class
  *TODO: Figure out how much RAM this will all use and find a controller board
