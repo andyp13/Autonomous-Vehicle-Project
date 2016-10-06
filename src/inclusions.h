@@ -1,7 +1,6 @@
 /*            STD Arduino Libs      */
 #include <Arduino.h>
 #include <Servo.h>
-#include <Wire.h>
 #include "SPI.h"
 #include <WiFi101.h>
 #include <Scheduler.h>
@@ -16,7 +15,6 @@
 #include "MPU6050.h"
 #include "ImuController.h"
 #include "WifiAccessPoint.h"
-#include "I2CWriteAnything.h"
 #include "I2CSend.h"
 
 /*     Enum Structs      */

@@ -1,4 +1,5 @@
 #include <config.h>
+#include <Wire.h>
 //////A Lot of this code is from Sparkfun's tutorial code.
 
 class CompassController {

@@ -1,4 +1,8 @@
 #include <config.h>
+#include <Wire.h>
+#include <avr/dtostrf.h>
+#include "I2CWriteAnything.h"
+
 
 class I2CSend {
 public:
@@ -9,9 +13,16 @@ public:
     }
 
     void returnNumbers() {
+      //char buffer[30];
+      //Serial.println("converting to string");
+      //dtostrf(wantedHeading, 8,4,buffer);
+      //Serial.println("Done");
+
       Wire.beginTransmission(kArduinoSlaveAddress);
-      I2C_writeAnything(throttle);
-      I2C_writeAnything(wantedHeading);
+      //Serial.println(throttle);
+      Wire.write(throttle);
+      //Serial.println((int)wantedHeading);
+      Wire.write((int)wantedHeading);
       Wire.endTransmission();
     }
 

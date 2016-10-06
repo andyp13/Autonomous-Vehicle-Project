@@ -25,5 +25,5 @@
 #define kMarginOfHeadingError 2
 //Wifi
 #define ssid "Clydes Ride"
-#define key "UCCSTEAM17"
-#define index 0
+/*#define key "UCCSTEAM17"
+#define index 0*/

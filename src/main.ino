@@ -36,7 +36,8 @@ CommandController mainController(gCommands, kNeutralThrottle,kStraightSteering);
 void setup() {
   //Will only run once
   Serial.begin(9600); //Really would like to be faster... depends on board.Test
-  while(!Serial);
+  Wire.begin(kArduinoMasterAddress);
+  //while(!Serial);
   Serial.println("Booting Up");
 
   // Pin Modes
@@ -85,13 +86,13 @@ Serial.println("Getting Time");
   Serial.println("Starting Access Point Loop");
   Scheduler.startLoop(updateWebpage);
 
-  //Serial.println("Starting RC Controller Loop");
-  //Scheduler.startLoop(rcControllerLoop);
+  Serial.println("Starting RC Controller Loop");
+  Scheduler.startLoop(rcControllerLoop);
 }
 
 void rcControllerLoop() {
 RcController.returnNumbers();
-delay(10);       //UPdate at 100 hertz
+yield();       //UPdate at 100 hertz
 }
 
 void buttonLoop() {
@@ -147,7 +148,7 @@ if (!mainController.isRunning()) {    //If the controller is not running
   if(!killswitchFlag) {
   RcController.changeVariables(mainController.getThrottle(), steering.getWantedHeading());
   } else {
-    RcController.changeVariables(kNeutralThrottle, kStraightSteering);
+    RcController.changeVariables(kNeutralThrottle, steering.getWantedHeading());
   }
 
   //Print Serial Info
