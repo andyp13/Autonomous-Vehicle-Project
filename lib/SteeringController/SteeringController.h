@@ -1,14 +1,13 @@
 /*TODO:Look at this code and see if it needs optimising */
-#include <config.h>
 
 class SteeringController {
 public:
   SteeringController(){}
 
-  void setNewHeading(double startHeading) {
+  void setNewHeading(float startHeading) {
     wantedHeading = startHeading;
   }
-  void setCurrentHeading(double newCurrentHeading) {
+  void setCurrentHeading(float newCurrentHeading) {
     currentHeading = newCurrentHeading;
   }
 
@@ -55,15 +54,15 @@ public:
 
   }
 
-  double getWantedHeading() {
+  float getWantedHeading() {
     return wantedHeading;
   }
 
 
 private:
 long lastSteeringCommand;
-double wantedHeading;
-double currentHeading;
+float wantedHeading;
+float currentHeading;
 
 
     void checkHeading() {  //If the wanted heading is greater than 360 or less than 180 it converts it.

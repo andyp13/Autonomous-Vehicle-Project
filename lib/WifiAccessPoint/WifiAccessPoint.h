@@ -1,4 +1,3 @@
-#include <config.h>
 #include <WiFi101.h>
 
   WiFiServer server(80);
@@ -41,53 +40,86 @@ public:
   }
 
   WiFiClient client = server.available();   // listen for incoming clients
-
   if (client) {  // got client?
+
     // an http request ends with a blank line
   boolean currentLineIsBlank = true;
   while (client.connected()) {
     digitalWrite(LED_BUILTIN, HIGH);
     if (client.available()) {
       char c = client.read();
-      //Serial.write(c);
-      // if you've gotten to the end of the line (received a newline
-      // character) and the line is blank, the http request has ended,
-      // so you can send a reply
-      if (c == '\n' && currentLineIsBlank) {
-        // send a standard http response header
-        client.println("HTTP/1.1 200 OK");
-        client.println("Content-Type: text/html");
-        client.println("Connection: close");  // the connection will be closed after completion of the response
-        client.println("Refresh: 1");  // refresh the page automatically every 5 sec
-        client.println();
-        client.println("<!DOCTYPE HTML>");
-        client.println("<html>");
-        // output the value of each analog input pin
-
-        client.print("Is it running:  "); client.print(isCurrentlyRunning);
-        client.println("<br>");
-        client.print("Throttle: "); client.print(throttle);
-        client.println("<br>");
-        client.print("Steering: "); client.print(steering);
-        client.println("<br>");
-        client.print("Current Heading: "); client.print(currentHeading);
-        client.println("<br>");
-        client.print("Wanted Heading:  "); client.print(wantedHeading);
-        client.println("<br>");
-
-        client.println("</html>");
-        client.println();
-        break;
-      }
-      if (c == '\n') {
-        // you're starting a new line
-        currentLineIsBlank = true;
-      }
-      else if (c != '\r') {
-        // you've gotten a character on the current line
-        currentLineIsBlank = false;
-      }
+    HTTP_req += c;  // save the HTTP request 1 char at a time
+// last line of client request is blank and ends with \n
+// respond to client only after last line received
+if (c == '\n' && currentLineIsBlank) {
+    // send a standard http response header
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("Connection: keep-alive");
+    client.println();
+    counter = 0;
+    // AJAX request for switch state
+    if (HTTP_req.indexOf("ajax_switch") > -1) {
+        // read switch state and analog input
+        getAjaxData(client);
+        counter = 0;
+        yield();
     }
+    else {  // HTTP request for web page
+        // send web page - contains JavaScript with AJAX calls
+        client.println("<!DOCTYPE html>");
+        client.println("<html>");
+        client.println("<head>");
+        client.println("<title>Arduino Web Page</title>");
+        client.println("<script>");
+        client.println("function GetSwitchAnalogData() {");
+        client.println(
+            "nocache = \"&nocache=\" + Math.random() * 1000000;");
+        client.println("var request = new XMLHttpRequest();");
+        client.println("request.onreadystatechange = function() {");
+        client.println("if (this.readyState == 4) {");
+        client.println("if (this.status == 200) {");
+        client.println("if (this.responseText != null) {");
+        client.println("document.getElementById(\"sw_an_data\")\
+.innerHTML = this.responseText;");
+        client.println("}}}}");
+        client.println(
+        "request.open(\"GET\", \"ajax_switch\" + nocache, true);");
+        client.println("request.send(null);");
+        client.println("setTimeout('GetSwitchAnalogData()', 200);");
+        client.println("}");
+        client.println("</script>");
+        client.println("</head>");
+        client.println("<body onload=\"GetSwitchAnalogData()\">");
+        client.println("<h1>Arduino AJAX Input</h1>");
+        client.println("<div id=\"sw_an_data\">");
+        client.println("</div>");
+        client.println("</body>");
+        client.println("</html>");
+    }
+    // display received HTTP request on serial port
+    //Serial.print(HTTP_req);
+    HTTP_req = "";            // finished with request, empty string
+    counter = 0;
+    break;
+}
+// every line of text received from the client ends with \r\n
+if (c == '\n') {
+      // last character on line of received text
+    // starting new line with next character read
+    currentLineIsBlank = true;
+    counter = 0;
+} else if (c != '\r') {
+    // a text character was received from client
+    currentLineIsBlank = false;
+    counter = 0;
+}
+} else if (counter > 5) {
+  counter = 0;
+  break;
+} else {
+  counter++;
+} // end if (client.available())
   }
   // give the web browser time to receive the data
   delay(1);
@@ -96,20 +128,28 @@ public:
   client.stop();
   Serial.println("client disconnected");
   digitalWrite(LED_BUILTIN, LOW);
+
 }
 }
+
 
 // send the state of the switch to the web browser
 void getAjaxData(WiFiClient cl) {
+  cl.print("Is Running: "); cl.print(isCurrentlyRunning);
+  cl.println("<br>");
   cl.print("Throttle: "); cl.print(throttle);
+  cl.println("<br>");
   cl.print("Steering: "); cl.print(steering);
+  cl.println("<br>");
   cl.print("Current Heading: "); cl.print(currentHeading);
+  cl.println("<br>");
   cl.print("Wanted Heading:  "); cl.print(wantedHeading);
+  cl.println("<br>");
 
 
 }
 
-void updateInformation(int throttles, int steerings, double currentHeadings, double wantedHeadings, bool isRunning) {
+void updateInformation(int throttles, int steerings, float currentHeadings, float wantedHeadings, bool isRunning) {
   throttle = throttles;
   steering = steerings;
   currentHeading = currentHeadings;
@@ -118,10 +158,12 @@ void updateInformation(int throttles, int steerings, double currentHeadings, dou
 }
 
 private:
+  String HTTP_req;
+  int counter = 0;
   int status = WL_IDLE_STATUS;
   int throttle = 0;
   int steering = 0;
-  double currentHeading = 0;
-  double wantedHeading = 0;
+  float currentHeading = 0;
+  float wantedHeading = 0;
   bool isCurrentlyRunning;
 };

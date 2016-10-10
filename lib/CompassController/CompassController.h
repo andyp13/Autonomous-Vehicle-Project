@@ -1,5 +1,5 @@
-#include <config.h>
 #include <Wire.h>
+#include <config.h>
 //////A Lot of this code is from Sparkfun's tutorial code.
 
 class CompassController {
@@ -65,12 +65,12 @@ public:
 
   }
 
-  double getDegreeHeading() {
+  float getDegreeHeading() {
     return degreeHeading;
   }
 
-  double getAverageHeading() {
-      double sum = 0.0;
+  float getAverageHeading() {
+      float sum = 0.0;
 
       if (count < 4) {    //If there has not been four readings, just return the last reading
         return degreeHeading;
@@ -93,11 +93,11 @@ private:
   int x;
   int y;
   int z;
-  double h;
-  double degreeHeading;
+  float h;
+  float degreeHeading;
   long lastCheckTime;
   long currentTime;
   int i;
-  double average[4] = {0};
+  float average[4] = {0};
   int count;
 };

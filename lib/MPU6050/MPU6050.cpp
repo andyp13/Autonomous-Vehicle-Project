@@ -2036,9 +2036,9 @@ uint16_t MPU6050::getExternalSensorWord(int position) {
     I2Cdev::readBytes(devAddr, MPU6050_RA_EXT_SENS_DATA_00 + position, 2, buffer);
     return (((uint16_t)buffer[0]) << 8) | buffer[1];
 }
-/** Read double word (4 bytes) from external sensor data registers.
+/** Read float word (4 bytes) from external sensor data registers.
  * @param position Starting position (0-20)
- * @return Double word read from registers
+ * @return float word read from registers
  * @see getExternalSensorByte()
  */
 uint32_t MPU6050::getExternalSensorDWord(int position) {

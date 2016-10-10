@@ -878,7 +878,7 @@ void MPU60X0::setMasterClockSpeed(uint8_t speed) {
  * In read mode, the result of the read is placed in the lowest available 
  * EXT_SENS_DATA register. For further information regarding the allocation of
  * read results, please refer to the EXT_SENS_DATA register description
- * (Registers 73 – 96).
+ * (Registers 73 ï¿½ 96).
  *
  * The MPU-6050 supports a total of five slaves, but Slave 4 has unique
  * characteristics, and so it has its own functions (getSlave4* and setSlave4*).
@@ -1991,9 +1991,9 @@ uint16_t MPU60X0::getExternalSensorWord(int position) {
    I2Cdev::readBytes(bSPI, devAddr, MPU60X0_RA_EXT_SENS_DATA_00 + position, 2, buffer);
     return (((uint16_t)buffer[0]) << 8) | buffer[1];
 }
-/** Read double word (4 bytes) from external sensor data registers.
+/** Read float word (4 bytes) from external sensor data registers.
  * @param position Starting position (0-20)
- * @return Double word read from registers
+ * @return float word read from registers
  * @see getExternalSensorByte()
  */
 uint32_t MPU60X0::getExternalSensorDWord(int position) {

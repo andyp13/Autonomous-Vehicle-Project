@@ -1,11 +1,27 @@
+#define USE_WIFI101_SHIELD
+
+
 #include <inclusions.h>
+#include <config.h>
+#include <SPI.h>
+#include <WiFi101.h>
+#include <Scheduler.h>
+#include "ThingSpeak.h"
+unsigned long channelNumber   = 169571;
+const char * myWriteAPIKey = "YEY98XE2AZO67T1S";
+
 
 /*        CLASSES       */
+
+float wantedHeading = 0;
+float currentHeading = 0;
+int currentSteering = 0;
+int throttle = 0;
+
 
 CompassController compass;
 SteeringController steering;
 ImuController accelGyro;
-WifiAccessPoint myAccessPoint;
 CommunicationKey updateKey;
 I2CSend RcController;
 
@@ -14,14 +30,14 @@ Servo escServo;
 Button mainButton = Button( kMainButtonPin );
 
 /*   GLOBAL VARIABLES   */
-//safty
+//safety
 bool killswitchFlag = true;
 //Time
 int currentTime = 0;
 int lastSerialTime = 0;
 ////Commands
 long gCommands[] = {
-// Th  ST    FADE
+// Th  ST
   109, 90,    7650, //S
   90,   155,  2000, //R
   109,  90,    1350, //S
@@ -32,24 +48,27 @@ long gCommands[] = {
 };
 
 CommandController mainController(gCommands, kNeutralThrottle,kStraightSteering);
+WiFiClient sslClient;
 
 void setup() {
   //Will only run once
-  Serial.begin(9600); //Really would like to be faster... depends on board.Test
+  Serial.begin(9600);
   Wire.begin(kArduinoMasterAddress);
-  //while(!Serial);
+  while(!Serial);
   Serial.println("Booting Up");
 
-  // Pin Modes
-/*  pinMode(kSteeringServoPin, OUTPUT);
-  pinMode(kThrottlePin, OUTPUT);*/
-
-  /*      Servo setup       */
-  /*steeringServo.attach(kSteeringServoPin);
-  steeringServo.write(kStraightSteering);
-  escServo.attach(kThrottlePin);
-  escServo.write(kNeutralThrottle);*/
   pinMode(LED_BUILTIN, OUTPUT);
+  while (WiFi.begin(ssid, pass) != WL_CONNECTED) {
+    // unsuccessful, retry in 4 seconds
+    pinMode(LED_BUILTIN, HIGH);
+    Serial.print("failed ... ");
+    delay(4000);
+    Serial.print("retrying ... ");
+    pinMode(LED_BUILTIN, LOW);
+  }
+
+  Serial.println("Wifi Connected");
+  ThingSpeak.begin(sslClient);
 
 
   //Class setups
@@ -58,7 +77,6 @@ void setup() {
   accelGyro.setup();
   Serial.println("Main Classes Setup, Setting up Wifi");
 
-  myAccessPoint.setup();
   Serial.println("Wifi Setup");
   Serial.println("Steeting up RC controller");
   RcController.setup();
@@ -88,43 +106,60 @@ Serial.println("Getting Time");
 
   Serial.println("Starting RC Controller Loop");
   Scheduler.startLoop(rcControllerLoop);
+
+  Serial.println("Starting Update Numbers");
+  Scheduler.startLoop(updateVariables);
+}
+
+void updateVariables() {
+  wantedHeading = steering.getWantedHeading();
+  currentHeading = compass.getDegreeHeading();
+  currentSteering = steering.change();
+  throttle = mainController.getThrottle();
+  yield();
 }
 
 void rcControllerLoop() {
+  Serial.println(2);
 RcController.returnNumbers();
+
 yield();       //UPdate at 100 hertz
 }
 
 void buttonLoop() {
+  Serial.println(3);
   mainButton.loop();
+
   yield();
 }
 
 void mainControllerLoop() {
+  Serial.println(4);
   mainController.loop();
+
   yield();
 }
 
 void updateWebpage() {
-  if (!killswitchFlag) {
-    myAccessPoint.updateInformation(mainController.getThrottle(), steering.change(), compass.getDegreeHeading(), steering.getWantedHeading(), !killswitchFlag);
-  } else {
-    myAccessPoint.updateInformation(kNeutralThrottle, kStraightSteering, compass.getDegreeHeading(), steering.getWantedHeading(), !killswitchFlag);
-  }
-  delay(500);
+
+  Serial.println(5);
+   //Need new stuff
+   Serial.println(5.1);
+   ThingSpeak.writeField(channelNumber,1, currentHeading,myWriteAPIKey);
+   Serial.println(5.2);
+   ThingSpeak.writeField(channelNumber,2, wantedHeading,myWriteAPIKey);
+   Serial.println(5.3);
+   ThingSpeak.writeField(channelNumber,4, currentSteering,myWriteAPIKey);
+   Serial.println(5.5);
+   ThingSpeak.writeField(channelNumber,3, throttle,myWriteAPIKey);
+   Serial.println(5.6);
+   delay(1000);
 }
 
 void loop() {
   //Runs in a loop forever
   //Check Time
   currentTime = millis();
-
-  //Class Loops
-  //mainButton.loop();
-  //compass.loop();
-  //mainController.loop();    //TODO: Replace with correct controller here
-  //accelGyro.loop();
-  myAccessPoint.loop();
 
   steering.setCurrentHeading(compass.getDegreeHeading());
 
@@ -133,34 +168,39 @@ void loop() {
     delay(kDelayTime);
     mainController.start();      //TODO: Replace with correct controller here
     killswitchFlag = !killswitchFlag;
-    steering.setNewHeading(compass.getDegreeHeading());
+    steering.setNewHeading(currentHeading);
   }
 
   //Button If Statements
 if (!mainController.isRunning()) {    //If the controller is not running
     killswitchFlag = true;                //make sure nothing is running
-  }           //TODO: Replace with correct controller here*/
+  }
 
   //Find where to Turn
-  steering.headingChange(mainController.getSteering());    //TODO: Replace with correct controller here
+  steering.headingChange(mainController.getSteering());
 
 //As long as the button was not pushed. write to the servo
   if(!killswitchFlag) {
-  RcController.changeVariables(mainController.getThrottle(), steering.getWantedHeading());
+  RcController.changeVariables(throttle, wantedHeading);
   } else {
-    RcController.changeVariables(kNeutralThrottle, steering.getWantedHeading());
+    RcController.changeVariables(kNeutralThrottle, wantedHeading);
   }
 
   //Print Serial Info
   if(currentTime - lastSerialTime > kSerialOutputTime) {
-  Serial.print( steering.change() );
+    //ALL OUTPUTS
+  Serial.print( currentSteering );
   Serial.print("\t");
-  Serial.print(compass.getDegreeHeading());
+
+  Serial.print(currentHeading);
   Serial.print("\t");
+
   Serial.print(compass.getCount());
   Serial.print("\t");
-  Serial.print(steering.getWantedHeading());
+
+  Serial.print(wantedHeading);
   Serial.print("\n" );
+
   /*Serial.print("Acel:");Serial.print("\n");
   Serial.print("x: ");Serial.print(accelGyro.getAccelX()); Serial.print("\t");
   Serial.print("y: ");Serial.print(accelGyro.getAccelY()); Serial.print("\t");
@@ -174,18 +214,7 @@ if (!mainController.isRunning()) {    //If the controller is not running
 
 
 
-//Update webpage Info
 
 yield();
 
 }
-/** Things to do... no perticular order. Not all need to be done... When you finish it. delete and push.
- *TODO: Redo Controller Class to allow for GPS waypoints
- *TODO: Make a class for UltraSonic Sensors
- *TODO: Maybe: Make a class for LiDar Applications
- *TODO: Add a GPS controller class
- *TODO: Figure out how much RAM this will all use and find a controller board
- *TODO: Add a Accel controller class
- *TODO: Add a gyro Controller Class
- *TODO: Add an EncoderClass
- **/

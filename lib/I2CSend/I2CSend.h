@@ -1,8 +1,4 @@
-#include <config.h>
 #include <Wire.h>
-#include <avr/dtostrf.h>
-#include "I2CWriteAnything.h"
-
 
 class I2CSend {
 public:
@@ -28,12 +24,12 @@ public:
 
 
 
-  void changeVariables(int newThrottle, double newHeading){
+  void changeVariables(int newThrottle, float newHeading){
         throttle = newThrottle;
         wantedHeading = newHeading;
   }
 
 private:
   int throttle;
-  double wantedHeading;
+  float wantedHeading;
 };

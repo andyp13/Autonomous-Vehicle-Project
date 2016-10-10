@@ -18,12 +18,12 @@
 #define kArduinoMasterAddress 2
 
 /*            TIMINGS                */
-#define kDelayTime 1000
+#define kDelayTime 500
 #define kSerialOutputTime 250
 
 /*          ERROR CORRECTION         */
 #define kMarginOfHeadingError 2
 //Wifi
-#define ssid "Clydes Ride"
-/*#define key "UCCSTEAM17"
-#define index 0*/
+#define ssid "Andy's iPhone"
+#define pass "3032323912"
+//Cloud
