@@ -4,7 +4,7 @@
 #include "SPI.h"
 #include <WiFi101.h>
 #include <Scheduler.h>
-#include "ThingSpeak.h"
+//#include "ThingSpeak.h"
 
 /*          Project Additions       */
 #include "Button.h"
