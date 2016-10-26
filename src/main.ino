@@ -6,7 +6,6 @@
 #include <SPI.h>
 #include <WiFi101.h>
 #include <Scheduler.h>
-//#include "ThingSpeak.h"
 
 
 /*        CLASSES       */
@@ -17,7 +16,7 @@ int currentSteering = 0;
 int throttle = 0;
 
 
-CompassController compass;
+AdafruitCompassController compass;
 SteeringController steering;
 ImuController accelGyro;
 CommunicationKey updateKey;
@@ -73,6 +72,7 @@ void setup() {
         mainButton.setup();
         //compass.setup();
         accelGyro.setup();
+        compass.begin(12345);
         Serial.println("Main Classes Setup, Setting up Wifi");
 
         Serial.println("Wifi Setup");
@@ -107,6 +107,14 @@ void setup() {
 
         Serial.println("Starting Update Numbers");
         Scheduler.startLoop(updateVariables);
+
+        Serial.println("Starting Compass Loop");
+        Scheduler.startLoop(compassLoop);
+}
+
+void compassLoop() {
+  compass.loop();
+  delay(10);
 }
 
 void updateVariables() {
@@ -143,14 +151,6 @@ void updateWebpage() {
         Serial.println(5);
         //Need new stuff
         Serial.println(5.1);
-        /*ThingSpeak.writeField(channelNumber,1, currentHeading,myWriteAPIKey);
-           Serial.println(5.2);
-           ThingSpeak.writeField(channelNumber,2, wantedHeading,myWriteAPIKey);
-           Serial.println(5.3);
-           ThingSpeak.writeField(channelNumber,4, currentSteering,myWriteAPIKey);
-           Serial.println(5.5);
-           ThingSpeak.writeField(channelNumber,3, throttle,myWriteAPIKey);
-           Serial.println(5.6);*/
         delay(1000);
 }
 
@@ -164,7 +164,7 @@ void loop() {
         //Check  Button Press
         if ( mainButton.didPress() ) {
                 delay(kDelayTime);
-                mainController.start(); //TODO: Replace with correct controller here
+                mainController.start();
                 killswitchFlag = !killswitchFlag;
                 steering.setNewHeading(currentHeading);
         }
