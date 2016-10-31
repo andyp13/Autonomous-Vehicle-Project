@@ -4,7 +4,7 @@
 #define kThrottlePin 6
 
 /*          DEFAULT VALUES           */
-#define kNeutralThrottle 80
+#define kNeutralThrottle 79
 #define kStraightSteering 90
 
 /*          CONVERSIONS              */

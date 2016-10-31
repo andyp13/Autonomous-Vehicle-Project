@@ -17,8 +17,8 @@ public:
       Wire.beginTransmission(kArduinoSlaveAddress);
       //Serial.println(throttle);
       Wire.write(throttle);
-      //Serial.println((int)wantedHeading);
-      Wire.write((int)wantedHeading);
+      //Serial.println((int)(wantedHeading * 100));
+      Wire.write((int)(wantedHeading * 100));
       Wire.endTransmission();
     }
 

@@ -8,15 +8,9 @@
 
 /*          Project Additions       */
 #include "Button.h"
-#include "CompassController.h"
-#include "AdafruitCompassController.h"
 #include "CommandController.h"
-#include "SteeringController.h"
 #include "I2Cdev.h"
-#include "MPU6050.h"
 #include "ImuController.h"
-//#include "WifiAccessPoint.h"  deprecated
 #include "I2CSend.h"
 
 /*     Enum Structs      */
-typedef enum {kSteering, kThrottle, kHeading}CommunicationKey;

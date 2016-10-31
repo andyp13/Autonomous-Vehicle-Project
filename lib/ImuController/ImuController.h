@@ -1,6 +1,6 @@
 
-
-
+#include "config.h"
+#include "MPU6050.h"
 
 class ImuController{
 public:
@@ -41,6 +41,7 @@ public:
 
 
 private:
+
   MPU6050 accelGyro;
   int16_t accelX, accelY, accelZ;
   int16_t gyroX, gyroY, gyroZ;

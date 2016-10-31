@@ -1,6 +1,3 @@
-#define USE_WIFI101_SHIELD
-
-
 #include <inclusions.h>
 #include <config.h>
 #include <SPI.h>
@@ -16,10 +13,7 @@ int currentSteering = 0;
 int throttle = 0;
 
 
-AdafruitCompassController compass;
-SteeringController steering;
 ImuController accelGyro;
-CommunicationKey updateKey;
 I2CSend RcController;
 
 Servo steeringServo;
@@ -34,14 +28,14 @@ int currentTime = 0;
 int lastSerialTime = 0;
 ////Commands
 long gCommands[] = {
-// Th  ST
+      // Th  ST
         109, 90,    7650,//S
         90,   155,  2000,//R
-        109,  90,    1350,//S
-        90,   155,  2000,//R
-        109,  90,    2000,//S
-        30,  90,   3000,//STOP
-        80,  90,       0,//Complete
+        109,  90,    1350,  //S
+        90,   155,  2000,  //R
+        109,  90,    2000, //S
+        30,  90,   3000,   //STOP
+        80,  90,       0,  //Complete
 };
 
 CommandController mainController(gCommands, kNeutralThrottle,kStraightSteering);
@@ -55,24 +49,14 @@ void setup() {
         Serial.println("Booting Up");
 
         pinMode(LED_BUILTIN, OUTPUT);
-        while (WiFi.begin(ssid, pass) != WL_CONNECTED) {
-                // unsuccessful, retry in 4 seconds
-                pinMode(LED_BUILTIN, HIGH);
-                Serial.print("failed ... ");
-                delay(4000);
-                Serial.print("retrying ... ");
-                pinMode(LED_BUILTIN, LOW);
-        }
-
-        Serial.println("Wifi Connected");
-        //ThingSpeak.begin(sslClient);
-
 
         //Class setups
+        Serial.println("Setting Up main Button");
         mainButton.setup();
         //compass.setup();
+        Serial.println("Setting up Accelerometer and Gyro");
         accelGyro.setup();
-        compass.begin(12345);
+        //compass.begin(12345);
         Serial.println("Main Classes Setup, Setting up Wifi");
 
         Serial.println("Wifi Setup");
@@ -85,7 +69,6 @@ void setup() {
         currentTime = millis();
 
         Serial.println("Getting compass info");
-        steering.setNewHeading(compass.getDegreeHeading());
 
         //Let the compass/gps wake up
         Serial.println("Warming compass and wifi up.");
@@ -105,52 +88,38 @@ void setup() {
         Serial.println("Starting RC Controller Loop");
         Scheduler.startLoop(rcControllerLoop);
 
-        Serial.println("Starting Update Numbers");
+        Serial.println("Starting Internal VARIABLES");
         Scheduler.startLoop(updateVariables);
-
-        Serial.println("Starting Compass Loop");
-        Scheduler.startLoop(compassLoop);
 }
 
-void compassLoop() {
-  compass.loop();
-  delay(10);
-}
+
 
 void updateVariables() {
-        wantedHeading = steering.getWantedHeading();
-        currentHeading = compass.getDegreeHeading();
-        currentSteering = steering.change();
         throttle = mainController.getThrottle();
         yield();
 }
 
 void rcControllerLoop() {
-        Serial.println(2);
         RcController.returnNumbers();
 
-        yield(); //UPdate at 100 hertz
+        delay(1000); //UPdate at 1 hertz
 }
 
 void buttonLoop() {
-        Serial.println(3);
         mainButton.loop();
 
         yield();
 }
 
 void mainControllerLoop() {
-        Serial.println(4);
         mainController.loop();
 
         yield();
 }
 
 void updateWebpage() {
-
-        Serial.println(5);
         //Need new stuff
-        Serial.println(5.1);
+
         delay(1000);
 }
 
@@ -159,14 +128,12 @@ void loop() {
         //Check Time
         currentTime = millis();
 
-        steering.setCurrentHeading(compass.getDegreeHeading());
 
         //Check  Button Press
         if ( mainButton.didPress() ) {
-                delay(kDelayTime);
+                delay(kDelayTime);  //Should add delay to command... not here
                 mainController.start();
                 killswitchFlag = !killswitchFlag;
-                steering.setNewHeading(currentHeading);
         }
 
         //Button If Statements
@@ -174,31 +141,16 @@ void loop() {
                 killswitchFlag = true;    //make sure nothing is running
         }
 
-        //Find where to Turn
-        steering.headingChange(mainController.getSteering());
-
 //As long as the button was not pushed. write to the servo
-        if(!killswitchFlag) {
-                RcController.changeVariables(throttle, mainController.getSteering());
+        if(killswitchFlag == false) {
+                RcController.changeVariables(throttle, map(mainController.getSteering(),0,180,-80,80));
         } else {
-                RcController.changeVariables(kNeutralThrottle, wantedHeading);
+                RcController.changeVariables(kNeutralThrottle, (int32_t)map(mainController.getSteering(),0,180,-80,80));
         }
 
         //Print Serial Info
         if(currentTime - lastSerialTime > kSerialOutputTime) {
                 //ALL OUTPUTS
-                Serial.print( currentSteering );
-                Serial.print("\t");
-
-                Serial.print(currentHeading);
-                Serial.print("\t");
-
-                Serial.print(compass.getCount());
-                Serial.print("\t");
-
-                Serial.print(wantedHeading);
-                Serial.print("\n" );
-
                 /*Serial.print("Acel:");Serial.print("\n");
                    Serial.print("x: ");Serial.print(accelGyro.getAccelX()); Serial.print("\t");
                    Serial.print("y: ");Serial.print(accelGyro.getAccelY()); Serial.print("\t");
