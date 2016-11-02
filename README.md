@@ -4,4 +4,8 @@ We have worked on this code sense September 2016. If you have any questions rega
 
 This code uses the Arduino Framework and should work on all Arduino based micro controllers(as long as they have enough space).
 
-Please Check our wiki page for updated information on our code.
+##What our team uses
+* NanoWii atmega32u4
+* IMU: MPC6050
+* Compass: HMC5883
+* Body: Traxxas Slash
