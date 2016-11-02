@@ -47,16 +47,15 @@ void setup() {
         Wire.begin(kArduinoMasterAddress);
         while(!Serial) ;
         Serial.println("Booting Up");
+        Wire.onRequest(onRequest);
 
         pinMode(LED_BUILTIN, OUTPUT);
 
         //Class setups
         Serial.println("Setting Up main Button");
         mainButton.setup();
-        //compass.setup();
         Serial.println("Setting up Accelerometer and Gyro");
         accelGyro.setup();
-        //compass.begin(12345);
         Serial.println("Main Classes Setup, Setting up Wifi");
 
         Serial.println("Wifi Setup");
@@ -68,10 +67,9 @@ void setup() {
         //Time Setup
         currentTime = millis();
 
-        Serial.println("Getting compass info");
 
-        //Let the compass/gps wake up
-        Serial.println("Warming compass and wifi up.");
+        //Let the /gps wake up
+        Serial.println("Warming  and wifi up.");
         delay(750);
         Serial.println("All done.");
         Serial.println("Starting Loops");
@@ -86,23 +84,28 @@ void setup() {
         //Scheduler.startLoop(updateWebpage);
 
         Serial.println("Starting RC Controller Loop");
-        Scheduler.startLoop(rcControllerLoop);
+        //Scheduler.startLoop(rcControllerLoop);
 
-        Serial.println("Starting Internal VARIABLES");
+        Serial.println("Starting Variable Updater");
         Scheduler.startLoop(updateVariables);
+
+        Serial.println("All DONE!");
+
 }
 
-
+void onRequest() {
+  RcController.returnNumbers();
+}
 
 void updateVariables() {
-        throttle = mainController.getThrottle();
-        yield();
+  throttle = 0;
+  currentSteering = 0;
 }
 
 void rcControllerLoop() {
         RcController.returnNumbers();
 
-        delay(1000); //UPdate at 1 hertz
+        delay(10); //UPdate at 100 hertz
 }
 
 void buttonLoop() {
@@ -118,14 +121,14 @@ void mainControllerLoop() {
 }
 
 void updateWebpage() {
-        //Need new stuff
+        //Need new class here
 
         delay(1000);
 }
 
 void loop() {
         //Runs in a loop forever
-        //Check Time
+        //get Time
         currentTime = millis();
 
 
@@ -143,14 +146,14 @@ void loop() {
 
 //As long as the button was not pushed. write to the servo
         if(killswitchFlag == false) {
-                RcController.changeVariables(throttle, map(mainController.getSteering(),0,180,-80,80));
+                RcController.changeVariables((int16_t)mainController.getThrottle(), (int16_t)map(mainController.getSteering(),0,180,-80,80));
         } else {
-                RcController.changeVariables(kNeutralThrottle, (int32_t)map(mainController.getSteering(),0,180,-80,80));
+                RcController.changeVariables((int16_t)kNeutralThrottle, (int16_t)map(mainController.getSteering(),0,180,-80,80));
         }
 
         //Print Serial Info
         if(currentTime - lastSerialTime > kSerialOutputTime) {
-                //ALL OUTPUTS
+                //ALL INPUTS
                 /*Serial.print("Acel:");Serial.print("\n");
                    Serial.print("x: ");Serial.print(accelGyro.getAccelX()); Serial.print("\t");
                    Serial.print("y: ");Serial.print(accelGyro.getAccelY()); Serial.print("\t");
