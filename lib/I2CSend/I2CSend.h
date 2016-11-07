@@ -5,8 +5,7 @@ public:
   I2CSend(){}
 
   void setup() {
-    Wire.begin();
-    }
+      }
 
     void returnNumbers() {
       //char buffer[30];
@@ -14,22 +13,19 @@ public:
       //dtostrf(wantedHeading, 8,4,buffer);
       //Serial.println("Done");
 
-      Wire.beginTransmission(kArduinoSlaveAddress);
-      //Serial.println(throttle);
+      //Serial.print(throttle);      Serial.print("\t");
       Wire.write(throttle);
-      //Serial.println((int)(wantedHeading * 100));
-      Wire.write((int)(wantedHeading * 100));
-      Wire.endTransmission();
+      Wire.write((wantedHeading));
     }
 
 
 
-  void changeVariables(int newThrottle, float newHeading){
+  void changeVariables(int8_t newThrottle, int8_t newHeading){
         throttle = newThrottle;
         wantedHeading = newHeading;
   }
 
 private:
-  int throttle;
-  float wantedHeading;
+  int8_t throttle;
+  int8_t wantedHeading;
 };
