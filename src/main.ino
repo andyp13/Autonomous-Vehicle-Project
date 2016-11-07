@@ -3,6 +3,7 @@
 #include <SPI.h>
 #include <WiFi101.h>
 #include <Scheduler.h>
+#include <Wire.h>
 
 
 /*        CLASSES       */
@@ -13,7 +14,6 @@ int currentSteering = 0;
 int throttle = 0;
 
 
-ImuController accelGyro;
 I2CSend RcController;
 
 Servo steeringServo;
@@ -29,11 +29,14 @@ int lastSerialTime = 0;
 ////Commands
 long gCommands[] = {
       // Th  ST
-        109, 90,    7650,//S
-        90,   155,  2000,//R
-        109,  90,    1350,  //S
-        90,   155,  2000,  //R
-        109,  90,    2000, //S
+        130, 90,    4000,//S
+        130,   180,  2000,//R
+        130,  90,    2000,  //S
+        130,   180,  2000,  //R
+        130,  90,    2000, //S
+        130,   180,  2000,  //R
+        130,  90,    2000, //S
+        130,   180,  2000,  //R
         30,  90,   3000,   //STOP
         80,  90,       0,  //Complete
 };
@@ -44,10 +47,11 @@ WiFiClient sslClient;
 void setup() {
         //Will only run once
         Serial.begin(9600);
-        Wire.begin(kArduinoMasterAddress);
-        while(!Serial) ;
+        Wire.begin(0x3F);
+        //while(!Serial) ;
         Serial.println("Booting Up");
         Wire.onRequest(onRequest);
+
 
         pinMode(LED_BUILTIN, OUTPUT);
 
@@ -55,7 +59,6 @@ void setup() {
         Serial.println("Setting Up main Button");
         mainButton.setup();
         Serial.println("Setting up Accelerometer and Gyro");
-        accelGyro.setup();
         Serial.println("Main Classes Setup, Setting up Wifi");
 
         Serial.println("Wifi Setup");
@@ -66,6 +69,7 @@ void setup() {
         Serial.println("Getting Time");
         //Time Setup
         currentTime = millis();
+
 
 
         //Let the /gps wake up
@@ -80,8 +84,9 @@ void setup() {
         Serial.println("Starting Main Controller Loop");
         Scheduler.startLoop(mainControllerLoop);
 
-        //Serial.println("Starting Access Point Loop");
-        //Scheduler.startLoop(updateWebpage);
+        Serial.println("Starting Access Point Loop");
+        Scheduler.startLoop(updateWebpage);
+
 
         Serial.println("Starting RC Controller Loop");
         //Scheduler.startLoop(rcControllerLoop);
@@ -93,13 +98,14 @@ void setup() {
 
 }
 
+
 void onRequest() {
   RcController.returnNumbers();
 }
 
+
 void updateVariables() {
-  throttle = 0;
-  currentSteering = 0;
+  yield();
 }
 
 void rcControllerLoop() {
@@ -142,26 +148,21 @@ void loop() {
         //Button If Statements
         if (!mainController.isRunning()) { //If the controller is not running
                 killswitchFlag = true;    //make sure nothing is running
+                mainController.stop();
         }
 
 //As long as the button was not pushed. write to the servo
         if(killswitchFlag == false) {
-                RcController.changeVariables((int16_t)mainController.getThrottle(), (int16_t)map(mainController.getSteering(),0,180,-80,80));
+                RcController.changeVariables((unsigned int8_t)mainController.getThrottle(), (int8_t)map(mainController.getSteering(),0,180,-90,90));
         } else {
-                RcController.changeVariables((int16_t)kNeutralThrottle, (int16_t)map(mainController.getSteering(),0,180,-80,80));
+                RcController.changeVariables((unsigned int8_t)kNeutralThrottle, (int8_t)map(mainController.getSteering(),0,180,-90,90));
         }
 
         //Print Serial Info
         if(currentTime - lastSerialTime > kSerialOutputTime) {
                 //ALL INPUTS
-                /*Serial.print("Acel:");Serial.print("\n");
-                   Serial.print("x: ");Serial.print(accelGyro.getAccelX()); Serial.print("\t");
-                   Serial.print("y: ");Serial.print(accelGyro.getAccelY()); Serial.print("\t");
-                   Serial.print("z: ");Serial.print(accelGyro.getAccelZ()); Serial.print("\n");
-                   Serial.print("Gyro:"); Serial.print("\n");
-                   Serial.print("x: ");Serial.print(accelGyro.getGyroX()); Serial.print("\t");
-                   Serial.print("y: ");Serial.print(accelGyro.getGyroY()); Serial.print("\t");
-                   Serial.print("z: ");Serial.print(accelGyro.getGyroZ()); Serial.print("\n");*/
+                Serial.print((unsigned int8_t)mainController.getThrottle()); Serial.print("\t");
+                Serial.print((unsigned int8_t)map(mainController.getSteering(),0,180,-90,90)); Serial.println("\t");
                 lastSerialTime = currentTime;
         }
 

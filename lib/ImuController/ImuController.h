@@ -9,7 +9,6 @@ public:
   void setup() {
 
 //Init
-    Wire.begin();
     accelGyro.initialize();
 
 
