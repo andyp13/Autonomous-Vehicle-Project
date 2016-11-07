@@ -16,6 +16,8 @@ int throttle = 0;
 
 I2CSend RcController;
 
+ImuController imuController;
+
 Servo steeringServo;
 Servo escServo;
 Button mainButton = Button( kMainButtonPin );
@@ -29,16 +31,16 @@ int lastSerialTime = 0;
 ////Commands
 long gCommands[] = {
       // Th  ST
-        130, 90,    4000,//S
-        130,   180,  2000,//R
+        130, 90,    4000,   //S
+        130,   180,  2000,  //R
         130,  90,    2000,  //S
         130,   180,  2000,  //R
-        130,  90,    2000, //S
+        130,  90,    2000,  //S
         130,   180,  2000,  //R
-        130,  90,    2000, //S
+        130,  90,    2000,  //S
         130,   180,  2000,  //R
-        30,  90,   3000,   //STOP
-        80,  90,       0,  //Complete
+        30,  90,     3000,  //STOP
+        80,  90,       0,   //Complete
 };
 
 CommandController mainController(gCommands, kNeutralThrottle,kStraightSteering);
@@ -59,6 +61,7 @@ void setup() {
         Serial.println("Setting Up main Button");
         mainButton.setup();
         Serial.println("Setting up Accelerometer and Gyro");
+        imuController.setup();
         Serial.println("Main Classes Setup, Setting up Wifi");
 
         Serial.println("Wifi Setup");
@@ -88,8 +91,8 @@ void setup() {
         Scheduler.startLoop(updateWebpage);
 
 
-        Serial.println("Starting RC Controller Loop");
-        //Scheduler.startLoop(rcControllerLoop);
+        Serial.println("Starting IMU Loop");
+        Scheduler.startLoop(imuControllerLoop);
 
         Serial.println("Starting Variable Updater");
         Scheduler.startLoop(updateVariables);
@@ -108,8 +111,8 @@ void updateVariables() {
   yield();
 }
 
-void rcControllerLoop() {
-        RcController.returnNumbers();
+void imuControllerLoop() {
+        imuController.loop();
 
         delay(10); //UPdate at 100 hertz
 }
