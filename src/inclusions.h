@@ -23,5 +23,7 @@
 #include "I2Cdev.h"
 #include "ImuController.h"
 #include "I2CSend.h"
+#include "EncoderClass.h"
+#include "SpeedController.h"
 
 /*     Enum Structs      */

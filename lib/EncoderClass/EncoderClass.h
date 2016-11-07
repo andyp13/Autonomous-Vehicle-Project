@@ -7,14 +7,14 @@
 * @Last modified time: 11-07-2016
 */
 
-
+#include<Arduino.h>
 
 #define kSampleRate 10
 #define kAverageSize 5
 
 class EncoderClass{
 public:
-  EncoderClass(){}
+  EncoderClass();
 
   bool begin(int pin);
   void loop();
@@ -24,6 +24,7 @@ public:
 protected:
 
 private:
+  int pin;
   long currentTime;
   long lastRunTime;
   long currentCount;

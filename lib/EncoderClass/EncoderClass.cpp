@@ -9,11 +9,12 @@
 
 
 
-#include"EncoderClass.h"
+#include "EncoderClass.h"
 
-void EncoderClass::EncoderClass() {}
+EncoderClass::EncoderClass() {}
 
-bool EncoderClass::begin(int pin) {
+bool EncoderClass::begin(int newPin) {
+  pin = newPin;
   pinMode(pin, INPUT);
   currentTime = millis();
   return true;
@@ -48,7 +49,6 @@ long EncoderClass::rawHalfSecond() {
 }
 
 float EncoderClass::meterPerSecond() {
-  float average = 0;
   return (rawHalfSecond() / kAverageSize) * conversion;
 
 }
