@@ -4,7 +4,7 @@
 * @Email:  andy@phillips101.com
 * @Project: Autonomous Vehicle Project
 * @Last modified by:   andyp13
-* @Last modified time: 11-07-2016
+* @Last modified time: 11-14-2016
 */
 
 
@@ -15,7 +15,6 @@
 #include "SPI.h"
 #include <WiFi101.h>
 #include <Scheduler.h>
-//#include "ThingSpeak.h"
 
 /*          Project Additions       */
 #include "Button.h"
