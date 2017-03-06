@@ -19,10 +19,10 @@
 /*          Project Additions       */
 #include "Button.h"
 #include "CommandController.h"
-#include "I2Cdev.h"
+//#include "I2Cdev.h"
 #include "ImuController.h"
 #include "I2CSend.h"
 #include "EncoderClass.h"
-#include "SpeedController.h"
+//#include "SpeedController.h"
 
 /*     Enum Structs      */
