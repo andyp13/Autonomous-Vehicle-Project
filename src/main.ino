@@ -72,7 +72,7 @@ void setup() {
         Serial.println("Setting Up main Button");
         mainButton.setup();
         Serial.println("Setting up Accelerometer and Gyro");
-        imuController.setup();
+        //imuController.setup();
         Serial.println("Main Classes Setup, Setting up Wifi");
 
         Serial.println("Wifi Setup");
@@ -103,7 +103,7 @@ void setup() {
 
 
         Serial.println("Starting IMU Loop");
-        Scheduler.startLoop(imuControllerLoop);
+        //Scheduler.startLoop(imuControllerLoop);
 
         Serial.println("Starting Variable Updater");
         Scheduler.startLoop(updateVariables);
@@ -169,6 +169,7 @@ void loop() {
         if(killswitchFlag == false) {
                 RcController.changeVariables((unsigned int8_t)mainController.getThrottle(), (int8_t)map(mainController.getSteering(),0,180,-90,90));
         } else {
+          mainController.stop();
                 RcController.changeVariables((unsigned int8_t)kNeutralThrottle, (int8_t)map(mainController.getSteering(),0,180,-90,90));
         }
 
